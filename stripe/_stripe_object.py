@@ -272,6 +272,26 @@ class StripeObject:
         *,
         api_mode: ApiMode = "V1",
     ) -> Self:
+        """Construct a StripeObject from a dict (e.g. webhook payload fields).
+
+        Commonly used after verifying a webhook to rebuild typed objects::
+
+            event = stripe.Event.construct_from(payload, key=None)
+            # event.data.object is untyped; rebuild a concrete resource if needed:
+            sub = stripe.Subscription.construct_from(
+                event.data.object.to_dict(),
+                key=None,  # required; None means the object cannot call the API
+            )
+
+        Args:
+            values: Mapping of object fields (often from a webhook event).
+            key: API key used for subsequent requests from this object. Pass
+                ``None`` for read-only reconstruction from webhooks (no API calls).
+            stripe_version: Optional Stripe API version override.
+            stripe_account: Optional connected account id.
+            last_response: Optional raw response metadata.
+            api_mode: ``"V1"`` or ``"V2"`` API mode.
+        """
         from stripe._api_requestor import _APIRequestor  # pyright: ignore[reportPrivateUsage]
 
         return cls._construct_from(
